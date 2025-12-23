@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para Mi Amor 🎄</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #b71c1c;
+            --secondary: #1b5e20;
+            --paper: #fdf5e6;
+            --gold: #ffd700;
+        }
+
+        body {
+            margin: 0; padding: 0; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background: #050505; overflow: hidden;
+            font-family: 'Great Vibes', cursive;
+            touch-action: manipulation;
+        }
+
+        /* Nieve */
+        .snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+
+        /* Contenedor de Video Optimizado para Móvil */
+        #video-container {
+            position: fixed; top: 10px; right: 10px;
+            width: 110px; height: 65px;
+            z-index: 100; border: 2px solid white;
+            border-radius: 8px; overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            background: #000;
+        }
+
+        /* Contenedor Sobre */
+        .container { position: relative; z-index: 5; perspective: 1000px; }
+
+        .envelope-wrapper {
+            position: relative; width: 280px; height: 180px;
+            background: var(--primary); box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            cursor: pointer; transition: transform 0.5s;
+        }
+
+        .envelope-wrapper::before {
+            content: ""; position: absolute; z-index: 5;
+            border-top: 100px solid #d32f2f; border-right: 140px solid transparent; border-left: 140px solid transparent;
+            top: 0; transform-origin: top; transition: all 0.5s ease;
+        }
+
+        .envelope-wrapper::after {
+            content: ""; position: absolute; z-index: 4;
+            border-left: 140px solid #e53935; border-right: 140px solid #e53935;
+            border-bottom: 90px solid #c62828; bottom: 0;
+        }
+
+        /* Carta */
+        .letter {
+            position: absolute; bottom: 5px; left: 5%; width: 90%; height: 160px;
+            background: var(--paper); padding: 15px; box-sizing: border-box;
+            text-align: center; border-radius: 5px; transition: all 0.8s ease;
+            z-index: 3; overflow-y: auto;
+        }
+
+        .img-wrapper {
+            width: 100%; height: 140px; margin: 10px 0;
+            display: flex; justify-content: center; align-items: center;
+            background: #eee; border-radius: 4px;
+        }
+
+        .letter img {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain; border: 2px solid white;
+        }
+
+        .heart {
+            position: absolute; top: 50%; left: 50%; width: 30px; height: 30px;
+            background: var(--gold); z-index: 6; transform: translate(-50%, -50%) rotate(-45deg);
+        }
+        .heart::before, .heart::after {
+            content: ""; position: absolute; width: 30px; height: 30px;
+            background: var(--gold); border-radius: 50%;
+        }
+        .heart::before { top: -15px; left: 0; }
+        .heart::after { left: 15px; top: 0; }
+
+        /* Estados Abiertos */
+        .envelope-wrapper.open { transform: translateY(60px); }
+        .envelope-wrapper.open::before { transform: rotateX(180deg); z-index: 2; }
+        .envelope-wrapper.open .letter { transform: translateY(-180px); height: 320px; z-index: 4; }
+        .envelope-wrapper.open .heart { opacity: 0; }
+
+        .instrucciones {
+            position: absolute; bottom: -50px; width: 100%; text-align: center;
+            color: white; font-family: sans-serif; font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas class="snow-canvas" id="snowCanvas"></canvas>
+
+    <div id="video-container">
+        <div id="player"></div>
+    </div>
+
+    <div class="container">
+        <div class="envelope-wrapper" id="envelope" onclick="handleInteraction()">
+            <div class="heart"></div>
+            <div class="letter">
+                <h1>¡Feliz Navidad!</h1>
+                <p>Toca la foto para ver más...</p>
+                <div class="img-wrapper">
+                    <img id="galeria" src="TU_FOTO_1.jpg" onclick="cambiarFoto(event)">
+                </div>
+                <p>Eres mi razón favorita para sonreír. ❤️</p>
+            </div>
+        </div>
+        <div class="instrucciones">TOCA EL SOBRE</div>
+    </div>
+
+    <script>
+        // --- API YOUTUBE ---
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        const VIDEO_ID = 'B2qb6BfGnwg'; 
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                videoId: VIDEO_ID,
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 1,
+                    'modestbranding': 1,
+                    'rel': 0,
+                    'playsinline': 1 // VITAL PARA MÓVILES
+                }
+            });
+        }
+
+        // Maneja la apertura y el play simultáneo (Requerido por Safari/Chrome Mobile)
+        function handleInteraction() {
+            const env = document.getElementById('envelope');
+            
+            // Si el sobre está cerrado, ábrelo y dale Play
+            if(!env.classList.contains('open')) {
+                env.classList.add('open');
+                
+                // Intento de reproducción forzada tras el click
+                if(player && typeof player.playVideo === 'function') {
+                    player.playVideo();
+                }
+            }
+        }
+
+        // --- GALERÍA ---
+        const fotos = ["TU_FOTO_1.jpg", "TU_FOTO_2.jpg"]; 
+        let fotoIndex = 0;
+        function cambiarFoto(e) {
+            e.stopPropagation();
+            fotoIndex = (fotoIndex + 1) % fotos.length;
+            const img = document.getElementById('galeria');
+            img.style.opacity = 0;
+            setTimeout(() => { img.src = fotos[fotoIndex]; img.style.opacity = 1; }, 300);
+        }
+
+        // --- NIEVE ---
+        const canvas = document.getElementById('snowCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height - canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speed = Math.random() * 1 + 0.5;
+            }
+            update() { this.y += this.speed; if (this.y > canvas.height) this.reset(); }
+            draw() { ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); }
+        }
+        for (let i = 0; i < 80; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
