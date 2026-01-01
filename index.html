@@ -5,7 +5,7 @@
 <title>12 Meses, 12 Razones para Amarte 💖</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?familyPacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -55,9 +55,13 @@ h1{
 .month-title{font-weight:600;font-size:1.3rem}
 .emoji{font-size:2.5rem;margin:10px 0}
 
-.content{display:none;animation:fade .5s}
+.content{
+    display:none;
+    animation:fade .5s;
+    margin-top:10px;
+}
+
 .card.open .content{display:block}
-.content img{width:120px;margin-top:10px}
 
 @keyframes fade{
     from{opacity:0;transform:translateY(10px)}
@@ -75,7 +79,7 @@ h1{
     cursor:pointer;
 }
 
-/* ===== MODAL ===== */
+/* MODAL */
 .modal{
     display:none;
     position:fixed;
@@ -89,65 +93,33 @@ h1{
 
 .modal-box{
     background:#fff;
-    max-width:900px;
+    max-width:700px;
     width:100%;
     border-radius:25px;
     padding:25px;
+    text-align:center;
 }
 
-.modal-content{
-    display:flex;
-    gap:20px;
-    align-items:center;
-}
-
-.left{
-    flex:1.3;
-    text-align:left;
-}
-
-.left img{
+.modal-box img{
     width:100%;
-    max-height:320px;
+    max-height:300px;
     object-fit:cover;
     border-radius:20px;
 }
 
-.left h2{
+.modal-box h2{
     font-family:'Pacifico',cursive;
     color:#ff4d6d;
     margin:15px 0 10px;
 }
 
-.left p{
+.modal-box p{
     font-size:1.1rem;
     line-height:1.6;
 }
 
-.right{
-    flex:0.7;
-    width:100%;
-}
-
-.video{
-    position:relative;
-    width:100%;
-    padding-bottom:56.25%;
-    border-radius:15px;
-    overflow:hidden;
-}
-
-.video iframe{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    border:none;
-}
-
 .close{
-    display:block;
-    margin:20px auto 0;
+    margin-top:20px;
     padding:10px 30px;
     border:none;
     border-radius:25px;
@@ -156,18 +128,14 @@ h1{
     cursor:pointer;
 }
 
-/* RESPONSIVE */
-@media(max-width:768px){
-    .modal-content{flex-direction:column}
-}
-
-/* Corazones */
+/* Corazones flotantes */
 .heart{
     position:fixed;
     bottom:-20px;
     animation:float 6s linear infinite;
     opacity:.7;
 }
+
 @keyframes float{
     to{transform:translateY(-120vh);opacity:0}
 }
@@ -181,77 +149,79 @@ h1{
 <p class="subtitle">Un regalo para comenzar juntos el 2026</p>
 
 <div class="months">
+
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Enero</div>
     <div class="emoji">😊</div>
-    <div class="content"><p>Tu sonrisa ilumina mi vida.</p></div>
+    <div class="content">Tu sonrisa ilumina mi vida.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Febrero</div>
     <div class="emoji">💖</div>
-    <div class="content"><p>Tu forma de amar me hace sentir en casa.</p></div>
+    <div class="content">Tu forma de amar me hace sentir en casa.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Marzo</div>
     <div class="emoji">🌷</div>
-    <div class="content"><p>Tu apoyo me da fuerzas.</p></div>
+    <div class="content">Tu apoyo me da fuerzas cada día.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Abril</div>
     <div class="emoji">😂</div>
-    <div class="content"><p>Tu risa es mi sonido favorito.</p></div>
+    <div class="content">Tu risa es mi sonido favorito.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Mayo</div>
     <div class="emoji">🥰</div>
-    <div class="content"><p>Tu ternura lo hace todo más bonito.</p></div>
+    <div class="content">Tu ternura lo hace todo más bonito.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Junio</div>
     <div class="emoji">💗</div>
-    <div class="content"><p>Tu paciencia me enseña a ser mejor.</p></div>
+    <div class="content">Tu paciencia me enseña a ser mejor.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Julio</div>
     <div class="emoji">🤗</div>
-    <div class="content"><p>Tus abrazos son mi hogar.</p></div>
+    <div class="content">Tus abrazos son mi lugar seguro.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Agosto</div>
     <div class="emoji">👀</div>
-    <div class="content"><p>Tu mirada dice más que mil palabras.</p></div>
+    <div class="content">Tu mirada dice más que mil palabras.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Septiembre</div>
     <div class="emoji">🎶</div>
-    <div class="content"><p>Tu voz calma mi corazón.</p></div>
+    <div class="content">Tu voz calma mi corazón.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Octubre</div>
     <div class="emoji">🍁</div>
-    <div class="content"><p>Tu cuidado es un regalo diario.</p></div>
+    <div class="content">La forma en que me cuidas es un regalo.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Noviembre</div>
     <div class="emoji">📸</div>
-    <div class="content"><p>Cada recuerdo contigo es un tesoro.</p></div>
+    <div class="content">Cada recuerdo contigo es un tesoro.</div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Diciembre</div>
     <div class="emoji">🎄❤️</div>
-    <div class="content"><p>Nuestro amor es lo más bonito del año.</p></div>
+    <div class="content">Nuestro amor es lo más bonito del año.</div>
 </div>
+
 </div>
 
 <button class="btn" onclick="openModal()">Mensaje para ti ❤️</button>
@@ -260,31 +230,15 @@ h1{
 <!-- MODAL -->
 <div class="modal" id="modal">
 <div class="modal-box">
-<div class="modal-content">
-    <div class="left">
-        <img src="https://ascomsa.com/masivos/images-productos/prest-2016/Foto5.jpeg">
-        <h2>Para ti, mi amor 💖</h2>
-        <p>
-            Gracias por ser parte de mi vida.  
-            En este 2026 quiero seguir caminando contigo,
-            creciendo juntos y amándonos cada día más.
-        </p>
-    </div>
-
-    <div class="right">
-        <div class="video">
-            <iframe
-                id="yt"
-                src=""
-                allow="autoplay; encrypted-media; picture-in-picture"
-                allowfullscreen
-                playsinline>
-            </iframe>
-        </div>
-    </div>
-</div>
-
-<button class="close" onclick="closeModal()">Cerrar ❤️</button>
+    <img src="https://ascomsa.com/masivos/images-productos/prest-2016/Foto5.jpeg">
+    <h2>Para ti, mi amor 💖</h2>
+    <p>
+        Gracias por ser parte de mi vida.  
+        En este 2026 quiero seguir caminando contigo,
+        creciendo juntos y amándonos cada día más.
+        Eres mi mejor elección ❤️
+    </p>
+    <button class="close" onclick="closeModal()">Cerrar ❤️</button>
 </div>
 </div>
 
@@ -297,18 +251,11 @@ function toggleCard(card){
 }
 
 function openModal(){
-    const modal = document.getElementById("modal");
-    const yt = document.getElementById("yt");
-
-    modal.style.display = "flex";
-
-    // ✅ LINK EMBED VÁLIDO (NO MODIFIQUES watch?v)
-    yt.src = "https://youtu.be/NZGHXy1IAHM?list=RDNZGHXy1IAHM";
+    document.getElementById("modal").style.display="flex";
 }
 
 function closeModal(){
     document.getElementById("modal").style.display="none";
-    document.getElementById("yt").src="";
 }
 
 // Corazones flotantes
@@ -325,3 +272,4 @@ setInterval(()=>{
 
 </body>
 </html>
+
