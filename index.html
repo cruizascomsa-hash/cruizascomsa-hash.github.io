@@ -1,823 +1,365 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Para Mi Amor 🎄</title>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #b71c1c;
-            --paper: #fdf5e6;
-            --gold: #ffd700;
-        }
+<meta charset="UTF-8">
+<title>12 Meses, 12 Razones para Amarte 💖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        * {
-            box-sizing: border-box;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
 
-        body {
-            margin: 0; 
-            padding: 20px; 
-            min-height: 100vh;
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            background: #050505; 
-            font-family: 'Great Vibes', cursive;
-            touch-action: manipulation;
-            overflow-x: hidden;
-        }
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
 
-        /* Nieve */
-        .snow-canvas { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: 2; 
-            pointer-events: none; 
-        }
+body{
+    font-family:'Quicksand',sans-serif;
+    background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+    min-height:100vh;
+    padding:20px;
+    overflow-x:hidden;
+}
 
-        /* Contenedor de Video */
-        #video-container {
-            position: fixed; 
-            top: 10px; 
-            right: 10px;
-            width: 110px; 
-            height: 65px;
-            z-index: 100; 
-            border: 2px solid white;
-            border-radius: 8px; 
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            background: #000;
-        }
+.container{
+    max-width:1000px;
+    margin:auto;
+    text-align:center;
+}
 
-        /* Contenedor Principal */
-        .container { 
-            position: relative; 
-            z-index: 5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 420px;
-        }
+h1{
+    font-family:'Pacifico',cursive;
+    color:#fff;
+    font-size:2.5rem;
+}
 
-        /* SOBRE GRANDE */
-        .envelope-wrapper {
-            position: relative; 
-            width: 100%;
-            max-width: 380px;
-            height: 240px;
-            background: var(--primary); 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
-            cursor: pointer; 
-            transition: all 0.5s ease;
-            z-index: 10;
-        }
+.subtitle{
+    color:#fff;
+    margin:10px 0 30px;
+}
 
-        .envelope-wrapper::before {
-            content: ""; 
-            position: absolute; 
-            z-index: 11;
-            border-top: 140px solid #d32f2f; 
-            border-right: 190px solid transparent; 
-            border-left: 190px solid transparent;
-            top: 0; 
-            transform-origin: top; 
-            transition: all 0.5s ease;
-        }
+.months{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;
+}
 
-        .envelope-wrapper::after {
-            content: ""; 
-            position: absolute; 
-            z-index: 10;
-            border-left: 190px solid #e53935; 
-            border-right: 190px solid #e53935;
-            border-bottom: 120px solid #c62828; 
-            bottom: 0;
-        }
+.card{
+    background:rgba(255,255,255,0.95);
+    border-radius:20px;
+    padding:20px;
+    cursor:pointer;
+    transition:.4s;
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
+}
 
-        /* CARTA INDEPENDIENTE - BAJADA MÁS */
-        .letter {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 340px;
-            height: 200px;
-            background: var(--paper); 
-            padding: 15px 20px; /* Menos padding vertical para dar más espacio a la imagen */
-            text-align: center; 
-            border-radius: 10px; 
-            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            z-index: 5;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            opacity: 0;
-            visibility: hidden;
-        }
+.card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 15px 30px rgba(0,0,0,.25);
+}
 
-        .letter.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, calc(-50% - 70px)); /* MENOS movimiento hacia arriba */
-            height: 420px; /* MÁS ALTA para imágenes más grandes */
-            width: 360px;
-            z-index: 20;
-        }
+.month-title{font-weight:600;font-size:1.3rem}
+.emoji{font-size:2.5rem;margin:10px 0}
 
-        .letter-content {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+.content{display:none;animation:fade .6s}
+.card.open .content{display:block}
+.content img{width:120px;margin-top:10px}
 
-        /* IMAGEN MÁS GRANDE */
-        .img-wrapper {
-            flex: 1;
-            min-height: 400px; /* MÁS ALTA */
-            margin: 8px 0; /* Menos margen para aprovechar espacio */
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            position: relative;
-        }
+@keyframes fade{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
+}
 
-        .img-wrapper:hover {
-            transform: scale(1.02);
-        }
+.btn{
+    margin:40px auto;
+    padding:14px 32px;
+    border:none;
+    border-radius:30px;
+    background:#ff4d6d;
+    color:#fff;
+    font-size:1rem;
+    cursor:pointer;
+    transition:.3s;
+}
 
-        /* Indicador de galería */
-        .gallery-indicator {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-family: sans-serif;
-            z-index: 2;
-        }
+.btn:hover{transform:scale(1.05)}
 
-        .letter img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-            border-radius: 4px;
-            transition: all 0.4s ease;
-        }
+ /* ===== MODAL ===== */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    z-index:1000;
+    justify-content:center;
+    align-items:center;
+    padding:15px;
+}
 
-        .heart {
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            width: 40px; 
-            height: 40px;
-            background: var(--gold); 
-            z-index: 12; 
-            transform: translate(-50%, -50%) rotate(-45deg);
-            transition: all 0.5s ease;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.4);
-        }
-        
-        .heart::before, .heart::after {
-            content: ""; 
-            position: absolute; 
-            width: 40px; 
-            height: 40px;
-            background: var(--gold); 
-            border-radius: 50%;
-        }
-        
-        .heart::before { 
-            top: -20px; 
-            left: 0; 
-        }
-        
-        .heart::after { 
-            left: 20px; 
-            top: 0; 
-        }
+.modal-box{
+    background:#fff;
+    max-width:900px;
+    width:100%;
+    border-radius:25px;
+    padding:25px;
+    animation:fade .6s;
+}
 
-        .envelope-wrapper.open {
-            transform: translateY(40px); /* MENOS movimiento del sobre */
-            z-index: 15;
-        }
+.modal-content{
+    display:flex;
+    gap:20px;
+    align-items:center;
+}
 
-        .envelope-wrapper.open::before { 
-            transform: rotateX(180deg); 
-            z-index: 11;
-        }
-        
-        .envelope-wrapper.open .heart { 
-            opacity: 0;
-            transform: translate(-50%, -50%) rotate(-45deg) scale(0);
-        }
+.left{
+    flex:1.3;
+    text-align:left;
+}
 
-        /* Contenido de la carta - Textos más compactos */
-        h1 {
-            margin: 0 0 3px 0; /* Menos margen */
-            color: var(--primary);
-            font-family: 'Mountains of Christmas', cursive;
-            font-size: 2rem; /* Un poco más pequeño */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
+.left img{
+    width:100%;
+    max-height:320px;
+    object-fit:cover;
+    border-radius:20px;
+}
 
-        .letter p {
-            margin: 3px 0; /* Menos margen */
-            font-size: 1.1rem; /* Un poco más pequeño */
-            color: #333;
-            line-height: 1.3;
-            transition: opacity 0.3s ease;
-        }
+.left h2{
+    font-family:'Pacifico',cursive;
+    color:#ff4d6d;
+    margin:15px 0 10px;
+}
 
-        .text-content {
-            flex: 0 0 auto;
-        }
+.left p{
+    font-size:1.1rem;
+    line-height:1.6;
+}
 
-        .special-text {
-            font-style: italic;
-            color: var(--primary);
-            font-weight: bold;
-            margin: 6px 0; /* Menos margen */
-            min-height: 50px; /* Menos alto */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 3px; /* Menos padding */
-            font-size: 1.1rem; /* Tamaño ajustado */
-        }
+.right{
+    flex:0.7;
+}
 
-        .instrucciones {
-            position: absolute; 
-            bottom: -40px; 
-            width: 100%; 
-            text-align: center;
-            color: white; 
-            font-family: sans-serif; 
-            font-size: 0.9rem;
-            opacity: 0.8;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            z-index: 5;
-            transition: opacity 0.3s;
-        }
+.video{
+    position:relative;
+    padding-bottom:56.25%;
+    height:0;
+    border-radius:15px;
+    overflow:hidden;
+}
 
-        .envelope-wrapper.open ~ .instrucciones {
-            opacity: 0;
-        }
+.video iframe{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    border:none;
+}
 
-        /* Efecto de brillo en el sobre */
-        .envelope-wrapper::before,
-        .envelope-wrapper::after {
-            filter: brightness(1);
-            transition: filter 0.3s ease;
-        }
+.close{
+    display:block;
+    margin:20px auto 0;
+    padding:10px 30px;
+    border:none;
+    border-radius:25px;
+    background:#ff4d6d;
+    color:#fff;
+    cursor:pointer;
+}
 
-        .envelope-wrapper:hover::before,
-        .envelope-wrapper:hover::after {
-            filter: brightness(1.1);
-        }
+/* RESPONSIVE */
+@media(max-width:768px){
+    .modal-content{
+        flex-direction:column;
+    }
+}
 
-        /* Flechas de navegación */
-        .nav-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.2rem;
-            z-index: 3;
-            transition: all 0.3s ease;
-            user-select: none;
-        }
-
-        .nav-arrow:hover {
-            background: rgba(0, 0, 0, 0.8);
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .nav-prev {
-            left: 10px;
-        }
-
-        .nav-next {
-            right: 10px;
-        }
-
-        /* Responsive para tablets */
-        @media (max-width: 768px) {
-            .container {
-                max-width: 340px;
-            }
-            
-            .envelope-wrapper {
-                height: 220px;
-                max-width: 340px;
-            }
-            
-            .envelope-wrapper::before {
-                border-top: 130px solid #d32f2f; 
-                border-right: 170px solid transparent; 
-                border-left: 170px solid transparent;
-            }
-            
-            .envelope-wrapper::after {
-                border-left: 170px solid #e53935; 
-                border-right: 170px solid #e53935;
-                border-bottom: 110px solid #c62828;
-            }
-            
-            .letter {
-                width: 300px;
-                height: 180px;
-            }
-            
-            .letter.active {
-                width: 320px;
-                height: 380px; /* Más alta para tablets */
-                transform: translate(-50%, calc(-50% - 70px)); /* Menos arriba */
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .letter p {
-                font-size: 1rem;
-            }
-            
-            .special-text {
-                min-height: 45px;
-                font-size: 1rem;
-            }
-            
-            .img-wrapper {
-                min-height: 180px; /* Más alta en tablets */
-            }
-        }
-
-        /* Responsive para móviles */
-        @media (max-width: 480px) {
-            body {
-                padding: 15px;
-            }
-            
-            .container {
-                max-width: 300px;
-            }
-            
-            .envelope-wrapper {
-                height: 200px;
-                max-width: 300px;
-            }
-            
-            .envelope-wrapper::before {
-                border-top: 110px solid #d32f2f; 
-                border-right: 150px solid transparent; 
-                border-left: 150px solid transparent;
-            }
-            
-            .envelope-wrapper::after {
-                border-left: 150px solid #e53935; 
-                border-right: 150px solid #e53935;
-                border-bottom: 100px solid #c62828;
-            }
-            
-            .letter {
-                width: 270px;
-                height: 160px;
-                padding: 12px 15px;
-            }
-            
-            .letter.active {
-                width: 280px;
-                height: 360px; /* Más alta en móviles */
-                transform: translate(-50%, calc(-50% - 60px)); /* Menos arriba */
-            }
-            
-            h1 {
-                font-size: 1.6rem;
-            }
-            
-            .letter p {
-                font-size: 0.95rem;
-                margin: 2px 0;
-            }
-            
-            .img-wrapper {
-                min-height: 160px; /* Más alta en móviles */
-                margin: 6px 0;
-            }
-            
-            #video-container {
-                width: 90px;
-                height: 55px;
-            }
-            
-            .heart {
-                width: 35px;
-                height: 35px;
-            }
-            
-            .heart::before,
-            .heart::after {
-                width: 35px;
-                height: 35px;
-            }
-            
-            .heart::before {
-                top: -17.5px;
-            }
-            
-            .heart::after {
-                left: 17.5px;
-            }
-            
-            .special-text {
-                min-height: 40px;
-                font-size: 0.95rem;
-                margin: 4px 0;
-            }
-            
-            .gallery-indicator {
-                font-size: 0.7rem;
-                padding: 3px 6px;
-            }
-            
-            .nav-arrow {
-                width: 25px;
-                height: 25px;
-                font-size: 1rem;
-            }
-        }
-
-        /* Para pantallas muy pequeñas */
-        @media (max-width: 360px) {
-            .container {
-                max-width: 280px;
-            }
-            
-            .envelope-wrapper {
-                height: 180px;
-                max-width: 280px;
-            }
-            
-            .envelope-wrapper::before {
-                border-top: 100px solid #d32f2f; 
-                border-right: 140px solid transparent; 
-                border-left: 140px solid transparent;
-            }
-            
-            .envelope-wrapper::after {
-                border-left: 140px solid #e53935; 
-                border-right: 140px solid #e53935;
-                border-bottom: 90px solid #c62828;
-            }
-            
-            .letter {
-                width: 250px;
-                height: 150px;
-            }
-            
-            .letter.active {
-                width: 260px;
-                height: 340px; /* Más alta */
-                transform: translate(-50%, calc(-50% - 50px)); /* Menos arriba */
-            }
-            
-            h1 {
-                font-size: 1.4rem;
-            }
-            
-            .special-text {
-                min-height: 35px;
-                font-size: 0.9rem;
-            }
-            
-            .img-wrapper {
-                min-height: 150px;
-            }
-        }
-
-        /* Para pantallas grandes */
-        @media (min-width: 1200px) {
-            .container {
-                max-width: 420px;
-            }
-            
-            .envelope-wrapper {
-                height: 260px;
-                max-width: 420px;
-            }
-            
-            .envelope-wrapper::before {
-                border-top: 150px solid #d32f2f; 
-                border-right: 210px solid transparent; 
-                border-left: 210px solid transparent;
-            }
-            
-            .envelope-wrapper::after {
-                border-left: 210px solid #e53935; 
-                border-right: 210px solid #e53935;
-                border-bottom: 130px solid #c62828;
-            }
-            
-            .letter {
-                width: 380px;
-                height: 220px;
-            }
-            
-            .letter.active {
-                width: 400px;
-                height: 460px; /* Más alta en pantallas grandes */
-                transform: translate(-50%, calc(-50% - 90px)); /* Ajustado */
-            }
-            
-            .special-text {
-                min-height: 60px;
-                font-size: 1.2rem;
-            }
-            
-            .img-wrapper {
-                min-height: 220px; /* Más alta en pantallas grandes */
-            }
-        }
-
-        /* Asegurar que en dispositivos táctiles no haya problemas */
-        @media (hover: none) and (pointer: coarse) {
-            .img-wrapper:hover {
-                transform: none;
-            }
-            
-            .envelope-wrapper:hover::before,
-            .envelope-wrapper:hover::after {
-                filter: brightness(1);
-            }
-            
-            .nav-arrow:hover {
-                transform: translateY(-50%);
-                background: rgba(0, 0, 0, 0.5);
-            }
-        }
-    </style>
+/* Corazones */
+.heart{
+    position:fixed;
+    bottom:-20px;
+    animation:float 6s linear infinite;
+    opacity:.7;
+}
+@keyframes float{
+    to{transform:translateY(-120vh);opacity:0}
+}
+</style>
 </head>
+
 <body>
 
-    <canvas class="snow-canvas" id="snowCanvas"></canvas>
+<div class="container">
+<h1>12 Razones para amarte cada mes del año 💕</h1>
+<p class="subtitle">Un regalo para comenzar juntos el 2026</p>
 
-    <div id="video-container">
-        <div id="player"></div>
+<div class="months">
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Enero</div>
+    <div class="emoji">😊</div>
+    <div class="content">
+        <p>Tu sonrisa ilumina mi vida desde el primer dia que llegaste a mi vida</p>
+        <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Febrero</div>
+    <div class="emoji">💖</div>
+    <div class="content">
+        <p>Tu forma de amar hace que mi corazón se sienta seguro</p>
+        <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Marzo</div>
+    <div class="emoji">🌷</div>
+    <div class="content">
+        <p>Tu apoyo incondicional me da fuerzas cada día.</p>
+        <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Abril</div>
+    <div class="emoji">😂</div>
+    <div class="content">
+        <p>Tu risa es mi sonido favorito.</p>
+        <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Mayo</div>
+    <div class="emoji">🥰</div>
+    <div class="content">
+        <p>Tu ternura hace que todo sea más bonito.</p>
+        <img src="https://media.giphy.com/media/3oriO6qJiXajN0TyDu/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Junio</div>
+    <div class="emoji">💗</div>
+    <div class="content">
+        <p>Tu paciencia me enseña a ser mejor persona.</p>
+        <img src="https://media.giphy.com/media/xUPGcguWZHRC2HyBRS/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Julio</div>
+    <div class="emoji">🤗</div>
+    <div class="content">
+        <p>Tus abrazos son mi lugar seguro.</p>
+        <img src="https://media.giphy.com/media/l0MYyda4zTFG9q6ze/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Agosto</div>
+    <div class="emoji">👀</div>
+    <div class="content">
+        <p>Tu mirada y tus acciones dice más que mil palabras.</p>
+        <img src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Septiembre</div>
+    <div class="emoji">🎶</div>
+    <div class="content">
+        <p>Tu voz calma mi corazón.</p>
+        <img src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Octubre</div>
+    <div class="emoji">🍁</div>
+    <div class="content">
+        <p>La forma en que me cuidas es un regalo diario.</p>
+        <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Noviembre</div>
+    <div class="emoji">📸</div>
+    <div class="content">
+        <p>Cada recuerdo contigo es un tesoro.</p>
+        <img src="https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif">
+    </div>
+</div>
+
+<div class="card" onclick="toggleCard(this)">
+    <div class="month-title">Diciembre</div>
+    <div class="emoji">🎄❤️</div>
+    <div class="content">
+        <p>Nuestro amor es lo más bonito del año y de la vida.</p>
+        <img src="https://media.giphy.com/media/26tPplGWjN0xLybiU/giphy.gif">
+    </div>
+</div>
+
+</div>
+
+<button class="btn" onclick="openModal()">Mensaje para ti ❤️</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-box">
+
+<div class="modal-content">
+    <div class="left">
+        <img src="https://ascomsa.com/masivos/images-productos/prest-2016/Foto5.jpeg">
+        <h2>Para ti, mi amor 💖</h2>
+        <p>
+            Gracias por ser parte de mi vida.  
+           En el 2026, quiero seguir viviendo cosas hermosas contigo, creciendo juntos y amándonos cada día más.
+            Eres mi mejor elección ❤️
+        </p>
     </div>
 
-    <div class="container">
-        <div class="envelope-wrapper" id="envelope" onclick="handleInteraction()">
-            <div class="heart"></div>
+    <div class="right">
+        <div class="video">
+            <iframe id="yt" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
-        
-        <div class="letter" id="letter">
-            <div class="letter-content">
-                <div class="text-content">
-                    <h1>¡Feliz Navidad, mi amor!</h1>
-                    <p>Eres el mejor regalo que la vida me ha dado. Gracias por cada momento juntos este año.</p>
-                </div>
-                
-                <div class="img-wrapper" onclick="cambiarFoto(event)">
-                    <div class="nav-arrow nav-prev" onclick="cambiarFoto(event, -1)">‹</div>
-                    <div class="nav-arrow nav-next" onclick="cambiarFoto(event, 1)">›</div>
-                    <div class="gallery-indicator" id="galleryIndicator"></div>
-                    <img id="galeria" src="https://ascomsa.com/masivos/images-productos/prest-2016/Foto1.jpeg" alt="Nuestra foto especial">
-                </div>
-                
-                <div class="text-content">
-                    <p>Eres mi razón favorita para sonreír. ❤️</p>
-                    <div class="special-text" id="specialText">
-                        Cada momento contigo es un regalo del cielo...
-                    </div>
-                    <p>Por muchas Navidades más... ❤️</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="instrucciones"></div>
     </div>
+</div>
 
-    <script>
-        // --- API YOUTUBE ---
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+<button class="close" onclick="closeModal()">Cerrar ❤️</button>
+</div>
+</div>
 
-        var player;
-        const VIDEO_ID = 'B2qb6BfGnwg'; 
+<script>
+function toggleCard(card){
+    document.querySelectorAll(".card").forEach(c=>{
+        if(c!==card) c.classList.remove("open");
+    });
+    card.classList.toggle("open");
+}
 
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '100%',
-                width: '100%',
-                videoId: VIDEO_ID,
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 1,
-                    'modestbranding': 1,
-                    'rel': 0,
-                    'playsinline': 1
-                }
-            });
-        }
+function openModal(){
+    document.getElementById("modal").style.display="flex";
+    document.getElementById("yt").src =
+    "https://www.youtube.com/watch?v=6nuj-kTxZwg&list=RD6nuj-kTxZwg&start_radio=1";
+}
 
-        function handleInteraction() {
-            const envelope = document.getElementById('envelope');
-            const letter = document.getElementById('letter');
-            
-            if(!envelope.classList.contains('open')) {
-                // Abrir sobre
-                envelope.classList.add('open');
-                
-                // Mostrar carta con delay para sincronizar con animación
-                setTimeout(() => {
-                    letter.classList.add('active');
-                }, 300);
-                
-                // Reproducir video
-                if(player && typeof player.playVideo === 'function') {
-                    setTimeout(() => {
-                        player.playVideo();
-                    }, 500);
-                }
-            }
-        }
+function closeModal(){
+    document.getElementById("modal").style.display="none";
+    document.getElementById("yt").src="";
+}
 
-        // --- GALERÍA CON TEXTO ---
-        const galeria = [
-            {
-                imagen: "https://ascomsa.com/masivos/images-productos/prest-2016/Foto1.jpeg",
-                texto: "Cada momento contigo es un regalo del cielo, y este recuerdo es prueba de ello.",
-                descripcion: "Nuestra primera foto especial"
-            },
-            {
-                imagen: "https://ascomsa.com/masivos/images-productos/prest-2016/Foto2.jpeg",
-                texto: "Tu sonrisa ilumina mi mundo más que todas las estrellas juntas.",
-                descripcion: "Tu sonrisa que amo"
-            },
-            {
-                imagen: "https://ascomsa.com/masivos/images-productos/prest-2016/Foto3.jpeg",
-                texto: "En cada abrazo tuyo encuentro el hogar que siempre soñé.",
-                descripcion: "Un abrazo inolvidable"
-            },
-            {
-                imagen: "https://ascomsa.com/masivos/images-productos/prest-2016/Foto4.jpeg",
-                texto: "Contigo hasta el atardecer más simple se convierte en magia pura.",
-                descripcion: "Atardecer juntos"
-            },
-            {
-                imagen: "https://ascomsa.com/masivos/images-productos/prest-2016/Foto5.jpeg",
-                texto: "Eres el mejor regalo que la vida me ha dado, hoy y siempre.",
-                descripcion: "Mi mejor regalo"
-            }
-        ];
-        
-        let fotoIndex = 0;
-        
-        function cambiarFoto(e, direction = 1) {
-            e.stopPropagation();
-            e.preventDefault();
-            
-            // Calcular nuevo índice
-            fotoIndex += direction;
-            
-            // Verificar límites (circular)
-            if (fotoIndex >= galeria.length) {
-                fotoIndex = 0;
-            } else if (fotoIndex < 0) {
-                fotoIndex = galeria.length - 1;
-            }
-            
-            const img = document.getElementById('galeria');
-            const specialText = document.getElementById('specialText');
-            const galleryIndicator = document.getElementById('galleryIndicator');
-            
-            // Efecto de transición
-            img.style.opacity = '0';
-            img.style.transform = 'scale(0.9)';
-            specialText.style.opacity = '0';
-            
-            setTimeout(() => { 
-                // Cambiar imagen
-                img.src = galeria[fotoIndex].imagen;
-                img.alt = galeria[fotoIndex].descripcion;
-                
-                // Cambiar texto especial
-                specialText.textContent = galeria[fotoIndex].texto;
-                
-                // Actualizar indicador
-                galleryIndicator.textContent = `${fotoIndex + 1}/${galeria.length}`;
-                
-                // Restaurar opacidad
-                img.style.opacity = '1';
-                img.style.transform = 'scale(1)';
-                setTimeout(() => {
-                    specialText.style.opacity = '1';
-                }, 100);
-            }, 300);
-        }
+// Corazones flotantes
+setInterval(()=>{
+    const h=document.createElement("div");
+    h.className="heart";
+    h.textContent="💖";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=Math.random()*20+15+"px";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6000);
+},600);
+</script>
 
-        // Navegación con teclado
-        document.addEventListener('keydown', function(e) {
-            const envelope = document.getElementById('envelope');
-            if (envelope.classList.contains('open')) {
-                if (e.key === 'ArrowLeft') {
-                    cambiarFoto({stopPropagation: () => {}, preventDefault: () => {}}, -1);
-                } else if (e.key === 'ArrowRight') {
-                    cambiarFoto({stopPropagation: () => {}, preventDefault: () => {}}, 1);
-                }
-            }
-        });
-
-        // --- NIEVE SIMPLE ---
-        const canvas = document.getElementById('snowCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        
-        function resize() { 
-            canvas.width = window.innerWidth; 
-            canvas.height = window.innerHeight; 
-        }
-        
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Particle {
-            constructor() { 
-                this.reset(); 
-            }
-            
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height - canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speed = Math.random() * 1 + 0.5;
-            }
-            
-            update() { 
-                this.y += this.speed; 
-                if (this.y > canvas.height) this.reset(); 
-            }
-            
-            draw() { 
-                ctx.fillStyle = 'white'; 
-                ctx.beginPath(); 
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); 
-                ctx.fill(); 
-            }
-        }
-        
-        // Crear partículas
-        for (let i = 0; i < 80; i++) {
-            particles.push(new Particle());
-        }
-        
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            particles.forEach(p => { 
-                p.update(); 
-                p.draw(); 
-            });
-            
-            requestAnimationFrame(animate);
-        }
-        
-        // Iniciar animación
-        animate();
-
-        // Pre-cargar todas las imágenes
-        window.addEventListener('load', function() {
-            galeria.forEach(item => {
-                const img = new Image();
-                img.src = item.imagen;
-            });
-        });
-    </script>
 </body>
 </html>
 
