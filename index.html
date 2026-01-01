@@ -52,7 +52,6 @@ h1{
 
 .card:hover{
     transform:translateY(-8px);
-    box-shadow:0 15px 30px rgba(0,0,0,.25);
 }
 
 .month-title{font-weight:600;font-size:1.3rem}
@@ -76,10 +75,7 @@ h1{
     color:#fff;
     font-size:1rem;
     cursor:pointer;
-    transition:.3s;
 }
-
-.btn:hover{transform:scale(1.05)}
 
  /* ===== MODAL ===== */
 .modal{
@@ -99,7 +95,6 @@ h1{
     width:100%;
     border-radius:25px;
     padding:25px;
-    animation:fade .6s;
 }
 
 .modal-content{
@@ -133,12 +128,13 @@ h1{
 
 .right{
     flex:0.7;
+    width:100%;
 }
 
 .video{
     position:relative;
+    width:100%;
     padding-bottom:56.25%;
-    height:0;
     border-radius:15px;
     overflow:hidden;
 }
@@ -194,7 +190,7 @@ h1{
     <div class="month-title">Enero</div>
     <div class="emoji">😊</div>
     <div class="content">
-        <p>Tu sonrisa ilumina mi vida desde el primer dia que llegaste a mi vida</p>
+        <p>Tu sonrisa ilumina mi vida desde el primer día.</p>
         <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif">
     </div>
 </div>
@@ -203,7 +199,7 @@ h1{
     <div class="month-title">Febrero</div>
     <div class="emoji">💖</div>
     <div class="content">
-        <p>Tu forma de amar hace que mi corazón se sienta seguro</p>
+        <p>Tu forma de amar me hace sentir en casa.</p>
         <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif">
     </div>
 </div>
@@ -212,7 +208,7 @@ h1{
     <div class="month-title">Marzo</div>
     <div class="emoji">🌷</div>
     <div class="content">
-        <p>Tu apoyo incondicional me da fuerzas cada día.</p>
+        <p>Tu apoyo me da fuerzas cada día.</p>
         <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
     </div>
 </div>
@@ -230,7 +226,7 @@ h1{
     <div class="month-title">Mayo</div>
     <div class="emoji">🥰</div>
     <div class="content">
-        <p>Tu ternura hace que todo sea más bonito.</p>
+        <p>Tu ternura hace todo más bonito.</p>
         <img src="https://media.giphy.com/media/3oriO6qJiXajN0TyDu/giphy.gif">
     </div>
 </div>
@@ -239,7 +235,7 @@ h1{
     <div class="month-title">Junio</div>
     <div class="emoji">💗</div>
     <div class="content">
-        <p>Tu paciencia me enseña a ser mejor persona.</p>
+        <p>Tu paciencia me enseña a ser mejor.</p>
         <img src="https://media.giphy.com/media/xUPGcguWZHRC2HyBRS/giphy.gif">
     </div>
 </div>
@@ -257,7 +253,7 @@ h1{
     <div class="month-title">Agosto</div>
     <div class="emoji">👀</div>
     <div class="content">
-        <p>Tu mirada y tus acciones dice más que mil palabras.</p>
+        <p>Tu mirada dice más que mil palabras.</p>
         <img src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif">
     </div>
 </div>
@@ -293,7 +289,7 @@ h1{
     <div class="month-title">Diciembre</div>
     <div class="emoji">🎄❤️</div>
     <div class="content">
-        <p>Nuestro amor es lo más bonito del año y de la vida.</p>
+        <p>Nuestro amor es lo más bonito del año.</p>
         <img src="https://media.giphy.com/media/26tPplGWjN0xLybiU/giphy.gif">
     </div>
 </div>
@@ -313,14 +309,20 @@ h1{
         <h2>Para ti, mi amor 💖</h2>
         <p>
             Gracias por ser parte de mi vida.  
-           En el 2026, quiero seguir viviendo cosas hermosas contigo, creciendo juntos y amándonos cada día más.
+            En este 2026 quiero seguir caminando contigo,
+            creciendo juntos y amándonos cada día más.
             Eres mi mejor elección ❤️
         </p>
     </div>
 
     <div class="right">
         <div class="video">
-            <iframe id="yt" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe
+                id="yt"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowfullscreen
+                playsinline>
+            </iframe>
         </div>
     </div>
 </div>
@@ -338,9 +340,11 @@ function toggleCard(card){
 }
 
 function openModal(){
-    document.getElementById("modal").style.display="flex";
-    document.getElementById("yt").src =
-    "https://www.youtube.com/watch?v=6nuj-kTxZwg&list=RD6nuj-kTxZwg&start_radio=1";
+    const modal = document.getElementById("modal");
+    const yt = document.getElementById("yt");
+
+    modal.style.display = "flex";
+    yt.src = "https://www.youtube.com/embed/6nuj-kTxZwg?autoplay=1&playsinline=1";
 }
 
 function closeModal(){
@@ -362,4 +366,3 @@ setInterval(()=>{
 
 </body>
 </html>
-
