@@ -5,7 +5,7 @@
 <title>12 Meses, 12 Razones para Amarte 💖</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?familyPacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -50,14 +50,12 @@ h1{
     box-shadow:0 10px 20px rgba(0,0,0,.15);
 }
 
-.card:hover{
-    transform:translateY(-8px);
-}
+.card:hover{transform:translateY(-8px)}
 
 .month-title{font-weight:600;font-size:1.3rem}
 .emoji{font-size:2.5rem;margin:10px 0}
 
-.content{display:none;animation:fade .6s}
+.content{display:none;animation:fade .5s}
 .card.open .content{display:block}
 .content img{width:120px;margin-top:10px}
 
@@ -77,7 +75,7 @@ h1{
     cursor:pointer;
 }
 
- /* ===== MODAL ===== */
+/* ===== MODAL ===== */
 .modal{
     display:none;
     position:fixed;
@@ -160,9 +158,7 @@ h1{
 
 /* RESPONSIVE */
 @media(max-width:768px){
-    .modal-content{
-        flex-direction:column;
-    }
+    .modal-content{flex-direction:column}
 }
 
 /* Corazones */
@@ -185,115 +181,77 @@ h1{
 <p class="subtitle">Un regalo para comenzar juntos el 2026</p>
 
 <div class="months">
-
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Enero</div>
     <div class="emoji">😊</div>
-    <div class="content">
-        <p>Tu sonrisa ilumina mi vida desde el primer día.</p>
-        <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif">
-    </div>
+    <div class="content"><p>Tu sonrisa ilumina mi vida.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Febrero</div>
     <div class="emoji">💖</div>
-    <div class="content">
-        <p>Tu forma de amar me hace sentir en casa.</p>
-        <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif">
-    </div>
+    <div class="content"><p>Tu forma de amar me hace sentir en casa.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Marzo</div>
     <div class="emoji">🌷</div>
-    <div class="content">
-        <p>Tu apoyo me da fuerzas cada día.</p>
-        <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
-    </div>
+    <div class="content"><p>Tu apoyo me da fuerzas.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Abril</div>
     <div class="emoji">😂</div>
-    <div class="content">
-        <p>Tu risa es mi sonido favorito.</p>
-        <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif">
-    </div>
+    <div class="content"><p>Tu risa es mi sonido favorito.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Mayo</div>
     <div class="emoji">🥰</div>
-    <div class="content">
-        <p>Tu ternura hace todo más bonito.</p>
-        <img src="https://media.giphy.com/media/3oriO6qJiXajN0TyDu/giphy.gif">
-    </div>
+    <div class="content"><p>Tu ternura lo hace todo más bonito.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Junio</div>
     <div class="emoji">💗</div>
-    <div class="content">
-        <p>Tu paciencia me enseña a ser mejor.</p>
-        <img src="https://media.giphy.com/media/xUPGcguWZHRC2HyBRS/giphy.gif">
-    </div>
+    <div class="content"><p>Tu paciencia me enseña a ser mejor.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Julio</div>
     <div class="emoji">🤗</div>
-    <div class="content">
-        <p>Tus abrazos son mi lugar seguro.</p>
-        <img src="https://media.giphy.com/media/l0MYyda4zTFG9q6ze/giphy.gif">
-    </div>
+    <div class="content"><p>Tus abrazos son mi hogar.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Agosto</div>
     <div class="emoji">👀</div>
-    <div class="content">
-        <p>Tu mirada dice más que mil palabras.</p>
-        <img src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif">
-    </div>
+    <div class="content"><p>Tu mirada dice más que mil palabras.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Septiembre</div>
     <div class="emoji">🎶</div>
-    <div class="content">
-        <p>Tu voz calma mi corazón.</p>
-        <img src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif">
-    </div>
+    <div class="content"><p>Tu voz calma mi corazón.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Octubre</div>
     <div class="emoji">🍁</div>
-    <div class="content">
-        <p>La forma en que me cuidas es un regalo diario.</p>
-        <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
-    </div>
+    <div class="content"><p>Tu cuidado es un regalo diario.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Noviembre</div>
     <div class="emoji">📸</div>
-    <div class="content">
-        <p>Cada recuerdo contigo es un tesoro.</p>
-        <img src="https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif">
-    </div>
+    <div class="content"><p>Cada recuerdo contigo es un tesoro.</p></div>
 </div>
 
 <div class="card" onclick="toggleCard(this)">
     <div class="month-title">Diciembre</div>
     <div class="emoji">🎄❤️</div>
-    <div class="content">
-        <p>Nuestro amor es lo más bonito del año.</p>
-        <img src="https://media.giphy.com/media/26tPplGWjN0xLybiU/giphy.gif">
-    </div>
+    <div class="content"><p>Nuestro amor es lo más bonito del año.</p></div>
 </div>
-
 </div>
 
 <button class="btn" onclick="openModal()">Mensaje para ti ❤️</button>
@@ -302,7 +260,6 @@ h1{
 <!-- MODAL -->
 <div class="modal" id="modal">
 <div class="modal-box">
-
 <div class="modal-content">
     <div class="left">
         <img src="https://ascomsa.com/masivos/images-productos/prest-2016/Foto5.jpeg">
@@ -311,7 +268,6 @@ h1{
             Gracias por ser parte de mi vida.  
             En este 2026 quiero seguir caminando contigo,
             creciendo juntos y amándonos cada día más.
-            Eres mi mejor elección ❤️
         </p>
     </div>
 
@@ -319,6 +275,7 @@ h1{
         <div class="video">
             <iframe
                 id="yt"
+                src=""
                 allow="autoplay; encrypted-media; picture-in-picture"
                 allowfullscreen
                 playsinline>
@@ -345,10 +302,9 @@ function openModal(){
 
     modal.style.display = "flex";
 
-    yt.src =
-    "https://www.youtube.com/embed/zvNvR_UVZ_k?autoplay=1&mute=1&playsinline=1";
+    // ✅ LINK EMBED VÁLIDO (NO MODIFIQUES watch?v)
+    yt.src = "https://www.youtube.com/embed/zvNvR_UVZ_k?autoplay=1&mute=1&playsinline=1";
 }
-
 
 function closeModal(){
     document.getElementById("modal").style.display="none";
@@ -369,7 +325,3 @@ setInterval(()=>{
 
 </body>
 </html>
-
-
-
-
