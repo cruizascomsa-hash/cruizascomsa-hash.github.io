@@ -344,8 +344,11 @@ function openModal(){
     const yt = document.getElementById("yt");
 
     modal.style.display = "flex";
-    yt.src = "https://www.youtube.com/watch?v=zvNvR_UVZ_k&list=RDzvNvR_UVZ_k&start_radio=1";
+
+    yt.src =
+    "https://www.youtube.com/embed/zvNvR_UVZ_k?autoplay=1&mute=1&playsinline=1";
 }
+
 
 function closeModal(){
     document.getElementById("modal").style.display="none";
@@ -366,6 +369,7 @@ setInterval(()=>{
 
 </body>
 </html>
+
 
 
 
