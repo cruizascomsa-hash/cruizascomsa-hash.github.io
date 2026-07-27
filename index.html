@@ -1,275 +1,1340 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>12 Meses, 12 Razones para Amarte 💖</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ASCOMSA - Control de Inventarios</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #F8F9FA;
+            padding: 20px;
+            color: #1e293b;
+        }
+        .dashboard { max-width:1600px; margin:0 auto; position:relative; }
+        /* HEADER */
+        .header {
+            background: #0D2C54;
+            padding: 16px 28px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: white;
+            box-shadow: 0 4px 12px rgba(13,44,84,0.3);
+        }
+        .header-left { display:flex; align-items:center; gap:16px; }
+        .logo { display:flex; align-items:center; gap:12px; }
+        .logo img { height:50px; width:auto; border-radius:8px; background:white; padding:4px; }
+        .logo-text { font-size:1.6rem; font-weight:700; letter-spacing:1px; }
+        .header-title { font-size:1.2rem; font-weight:300; border-left:2px solid rgba(255,255,255,0.3); padding-left:20px; }
+        .header-right { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .header-right button {
+            background:transparent; border:1px solid rgba(255,255,255,0.3); color:white;
+            border-radius:50%; width:34px; height:34px; cursor:pointer; font-size:1.2rem;
+            transition:0.2s;
+        }
+        .header-right button:hover { background:rgba(255,255,255,0.1); }
+        .upload-btn {
+            background:#FF6B00; color:white; padding:8px 22px; border-radius:40px;
+            cursor:pointer; font-weight:600; font-size:0.9rem; border:none;
+            box-shadow:0 2px 8px rgba(255,107,0,0.3); transition:0.2s;
+        }
+        .upload-btn:hover { background:#e05f00; transform:scale(1.02); }
+        .upload-btn input { display:none; }
+        .file-name { font-size:0.85rem; opacity:0.8; }
 
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+        /* PANEL DE INVENTARIO (nuevo) */
+        .inventory-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .inventory-panel .title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0D2C54;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .inventory-panel .title span {
+            background: #FF6B00;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .inventory-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px 50px;
+        }
+        .inventory-stats .stat {
+            text-align: center;
+        }
+        .inventory-stats .stat .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0D2C54;
+        }
+        .inventory-stats .stat .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 0.5px;
+        }
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
+        /* KPIs (resumen) */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: white;
+            padding: 16px 18px;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            text-align: center;
+            border-left: 4px solid #0D2C54;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .kpi-card:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.08); }
+        .kpi-card .label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; color:#64748b; font-weight:600; }
+        .kpi-card .value { font-size:1.6rem; font-weight:700; color:#0D2C54; margin-top:4px; }
+        .kpi-card.alert { border-left-color:#FF6B00; }
 
-body{
-    font-family:'Quicksand',sans-serif;
-    background:linear-gradient(135deg,#ff9a9e,#fad0c4);
-    min-height:100vh;
-    padding:20px;
-    overflow-x:hidden;
-}
+        /* FILTROS GLOBALES */
+        .filters {
+            background: white;
+            padding: 16px 24px;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px 30px;
+            align-items: center;
+        }
+        .filter-group { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .filter-group label { font-weight:500; font-size:0.85rem; color:#334155; }
+        .filter-group input, .filter-group select {
+            padding:6px 14px; border-radius:30px; border:1px solid #e2e8f0;
+            background:white; font-size:0.85rem; min-width:130px;
+        }
+        .filter-group input[type="date"] { min-width:140px; }
+        .filter-group input[type="text"] { min-width:200px; }
+        .badge-count {
+            background:#eef2ff; color:#0D2C54; padding:2px 12px; border-radius:30px;
+            font-size:0.75rem; font-weight:600; margin-left:8px;
+        }
 
-.container{
-    max-width:1000px;
-    margin:auto;
-    text-align:center;
-}
+        /* GRID DE GRÁFICOS */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px 18px 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            transition: 0.2s;
+        }
+        .chart-card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.08); }
+        .chart-card h3 { font-size:0.95rem; font-weight:600; color:#0D2C54; margin-bottom:4px; padding-left:4px; }
+        .chart-card .chart-wrapper { position:relative; height:220px; flex:1; }
+        .chart-card .chart-wrapper canvas { width:100% !important; height:100% !important; }
+        .full-width { grid-column:1 / -1; }
+        .full-width .chart-wrapper { height:260px; }
 
-h1{
-    font-family:'Pacifico',cursive;
-    color:#fff;
-    font-size:2.5rem;
-}
+        /* FILTROS DE TABLA */
+        .table-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            margin: 8px 0 12px 0;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 10px;
+            align-items: center;
+        }
+        .table-filters label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #334155;
+        }
+        .table-filters select, .table-filters input {
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid #d1d5db;
+            font-size: 0.8rem;
+            background: white;
+        }
+        .table-filters input[type="number"] { width:80px; }
+        .table-filters .filter-badge {
+            background: #e2e8f0;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: #1e293b;
+        }
 
-.subtitle{
-    color:#fff;
-    margin:10px 0 30px;
-}
+        /* PANEL DE DETALLE LATERAL */
+        .detail-panel {
+            position: fixed;
+            right: -450px;
+            top: 0;
+            width: 420px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-panel.open { right:0; }
+        .detail-panel .close-btn { align-self:flex-end; background:none; border:none; font-size:1.8rem; cursor:pointer; color:#64748b; }
+        .detail-panel h3 { color:#0D2C54; margin-bottom:12px; border-bottom:2px solid #FF6B00; padding-bottom:8px; }
+        .detail-panel .detail-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+        .detail-panel .detail-table th { background:#0D2C54; color:white; padding:6px 8px; position:sticky; top:0; z-index:2; text-align:left; }
+        .detail-panel .detail-table td { padding:4px 8px; border-bottom:1px solid #e9ecef; }
+        .detail-panel .detail-table tr:hover { background:#f1f5f9; }
+        .detail-panel .empty-msg { color:#94a3b8; font-style:italic; padding:20px 0; text-align:center; }
 
-.months{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:20px;
-}
+        /* MODAL CORPORATIVO */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active { display:flex; }
+        .modal-box {
+            background:white; border-radius:20px; max-width:500px; width:90%; padding:30px;
+            box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative;
+        }
+        .modal-box .close-modal { position:absolute; top:10px; right:20px; font-size:2rem; cursor:pointer; color:#64748b; }
+        .modal-box h2 { color:#0D2C54; margin-bottom:16px; }
+        .modal-box p { margin-bottom:10px; line-height:1.5; }
+        .modal-box .highlight { color:#FF6B00; font-weight:600; }
 
-.card{
-    background:rgba(255,255,255,0.95);
-    border-radius:20px;
-    padding:20px;
-    cursor:pointer;
-    transition:.4s;
-    box-shadow:0 10px 20px rgba(0,0,0,.15);
-}
+        /* TABLA KARDEX (dentro del chart-wrapper) */
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 6px;
+        }
+        .table-wrapper table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+        .table-wrapper th { background:#0D2C54; color:white; padding:8px 10px; position:sticky; top:0; z-index:2; text-align:left; white-space:nowrap; }
+        .table-wrapper td { padding:6px 10px; border-bottom:1px solid #e9ecef; white-space:nowrap; }
+        .table-wrapper tr:hover { background:#f1f5f9; }
 
-.card:hover{transform:translateY(-8px)}
-
-.month-title{font-weight:600;font-size:1.3rem}
-.emoji{font-size:2.5rem;margin:10px 0}
-
-.content{
-    display:none;
-    animation:fade .5s;
-    margin-top:10px;
-}
-
-.card.open .content{display:block}
-
-@keyframes fade{
-    from{opacity:0;transform:translateY(10px)}
-    to{opacity:1;transform:translateY(0)}
-}
-
-.btn{
-    margin:40px auto;
-    padding:14px 32px;
-    border:none;
-    border-radius:30px;
-    background:#ff4d6d;
-    color:#fff;
-    font-size:1rem;
-    cursor:pointer;
-}
-
-/* MODAL */
-.modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.7);
-    z-index:1000;
-    justify-content:center;
-    align-items:center;
-    padding:15px;
-}
-
-.modal-box{
-    background:#fff;
-    max-width:700px;
-    width:100%;
-    border-radius:25px;
-    padding:25px;
-    text-align:center;
-}
-
-.modal-box img{
-    width:100%;
-    max-height:300px;
-    object-fit:cover;
-    border-radius:20px;
-}
-
-.modal-box h2{
-    font-family:'Pacifico',cursive;
-    color:#ff4d6d;
-    margin:15px 0 10px;
-}
-
-.modal-box p{
-    font-size:1.1rem;
-    line-height:1.6;
-}
-
-.close{
-    margin-top:20px;
-    padding:10px 30px;
-    border:none;
-    border-radius:25px;
-    background:#ff4d6d;
-    color:#fff;
-    cursor:pointer;
-}
-
-/* Corazones flotantes */
-.heart{
-    position:fixed;
-    bottom:-20px;
-    animation:float 6s linear infinite;
-    opacity:.7;
-}
-
-@keyframes float{
-    to{transform:translateY(-120vh);opacity:0}
-}
-</style>
+        @media (max-width:900px) {
+            .chart-grid { grid-template-columns:1fr; }
+            .header-title { font-size:1rem; border-left:none; padding-left:0; width:100%; margin-top:6px; }
+            .filters { flex-direction:column; align-items:stretch; }
+            .filter-group { flex-wrap:wrap; }
+            .detail-panel { width:90%; right:-95%; }
+            .inventory-panel { flex-direction:column; align-items:flex-start; }
+            .inventory-stats { width:100%; justify-content:space-around; }
+        }
+        .footer { margin-top:30px; text-align:center; color:#94a3b8; font-size:0.75rem; }
+        .error-msg { background:#fee2e2; color:#b91c1c; padding:10px 20px; border-radius:12px; margin:10px 0; display:none; }
+        .logo-url-input { margin-top:8px; font-size:0.7rem; color:#94a3b8; text-align:right; }
+        .logo-url-input input { width:200px; padding:4px 8px; border-radius:20px; border:1px solid #ccc; font-size:0.7rem; }
+    </style>
 </head>
-
 <body>
+<div class="dashboard">
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">
+                <img id="logoImg" src="https://ascomsa.com/masivos/images-productos/prest-2016/LogoFinal.JPG" alt="Logo ASCOMSA">
+                <span class="logo-text">ASCOMSA</span>
+            </div>
+            <div class="header-title">Dashboard de Control de Inventarios &amp; Kardex</div>
+        </div>
+        <div class="header-right">
+            <span class="file-name" id="fileName">Ningún archivo</span>
+            <button id="infoButton" title="Información corporativa">ℹ️</button>
+            <label class="upload-btn">
+                📁 Cargar Excel
+                <input type="file" id="fileInput" accept=".xlsx,.xls">
+            </label>
+        </div>
+    </div>
 
-<div class="container">
-<h1>12 Razones para amarte cada mes del año 💕</h1>
-<p class="subtitle">Un regalo para comenzar juntos el 2026</p>
+    <!-- Logo personalizable (opcional) -->
+    <div class="logo-url-input">
+        <label>URL del logo: </label>
+        <input type="text" id="logoUrlInput" value="https://ascomsa.com/masivos/images-productos/prest-2016/LogoFinal.JPG">
+        <button onclick="document.getElementById('logoImg').src = document.getElementById('logoUrlInput').value">Aplicar</button>
+    </div>
 
-<div class="months">
+    <!-- ERROR -->
+    <div id="errorMsg" class="error-msg"></div>
 
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Enero</div>
-    <div class="emoji">😊</div>
-    <div class="content">Tu sonrisa ilumina mi vida.</div>
-</div>
+    <!-- PANEL DE INVENTARIO -->
+    <div class="inventory-panel" id="inventoryPanel">
+        <div class="title">
+            📦 Inventario
+            <span>ACTUALIZADO</span>
+        </div>
+        <div class="inventory-stats" id="inventoryStats">
+            <div class="stat">
+                <div class="number" id="invDays">-</div>
+                <div class="label">Días de inventario</div>
+            </div>
+            <div class="stat">
+                <div class="number" id="invUnits">-</div>
+                <div class="label">Unidades en stock</div>
+            </div>
+            <div class="stat">
+                <div class="number" id="invValue">-</div>
+                <div class="label">Valor total ($)</div>
+            </div>
+        </div>
+    </div>
 
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Febrero</div>
-    <div class="emoji">💖</div>
-    <div class="content">Tu forma de amar me hace sentir en casa.</div>
-</div>
+    <!-- KPIs (resumen) -->
+    <div class="kpi-grid" id="kpiContainer"></div>
 
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Marzo</div>
-    <div class="emoji">🌷</div>
-    <div class="content">Tu apoyo me da fuerzas cada día.</div>
-</div>
+    <!-- FILTROS GLOBALES -->
+    <div class="filters" id="filtersPanel">
+        <div class="filter-group">
+            <label>📅 Fecha desde:</label>
+            <input type="date" id="dateFrom">
+            <label>hasta:</label>
+            <input type="date" id="dateTo">
+        </div>
+        <div class="filter-group">
+            <label>📂 Línea:</label>
+            <select id="lineFilter"><option value="all">Todas</option></select>
+        </div>
+        <div class="filter-group">
+            <label>🔍 Buscar (código / artículo):</label>
+            <input type="text" id="searchInput" placeholder="Ej. MOUSE, 1100...">
+        </div>
+        <span class="badge-count" id="recordCount">0 registros</span>
+    </div>
 
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Abril</div>
-    <div class="emoji">😂</div>
-    <div class="content">Tu risa es mi sonido favorito.</div>
-</div>
+    <!-- GRID DE GRÁFICOS -->
+    <div class="chart-grid" id="chartGrid"></div>
 
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Mayo</div>
-    <div class="emoji">🥰</div>
-    <div class="content">Tu ternura lo hace todo más bonito.</div>
-</div>
+    <!-- PANEL DE DETALLE -->
+    <div class="detail-panel" id="detailPanel">
+        <button class="close-btn" id="closeDetail">&times;</button>
+        <h3 id="detailTitle">Detalle</h3>
+        <div id="detailContent">
+            <p class="empty-msg">Haz clic en una tarjeta KPI o en una barra de los gráficos para ver los productos.</p>
+        </div>
+    </div>
 
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Junio</div>
-    <div class="emoji">💗</div>
-    <div class="content">Tu paciencia me enseña a ser mejor.</div>
-</div>
+    <!-- MODAL CORPORATIVO -->
+    <div class="modal-overlay" id="corporateModal">
+        <div class="modal-box">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2>🏢 ASCOMSA</h2>
+            <p><span class="highlight">Misión:</span> Proveer soluciones tecnológicas innovadoras que impulsen el éxito de nuestros clientes.</p>
+            <p><span class="highlight">Visión:</span> Ser líderes en distribución de tecnología en la región, destacando por nuestra calidad y servicio.</p>
+            <p><span class="highlight">Valores:</span> Integridad, Innovación, Compromiso y Trabajo en Equipo.</p>
+            <hr style="margin:16px 0; border-color:#e2e8f0;">
+            <p style="font-size:0.9rem; color:#64748b;">Este dashboard fue diseñado para optimizar la gestión de inventario y toma de decisiones.</p>
+        </div>
+    </div>
 
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Julio</div>
-    <div class="emoji">🤗</div>
-    <div class="content">Tus abrazos son mi lugar seguro.</div>
-</div>
-
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Agosto</div>
-    <div class="emoji">👀</div>
-    <div class="content">Tu mirada dice más que mil palabras.</div>
-</div>
-
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Septiembre</div>
-    <div class="emoji">🎶</div>
-    <div class="content">Tu voz calma mi corazón.</div>
-</div>
-
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Octubre</div>
-    <div class="emoji">🍁</div>
-    <div class="content">La forma en que me cuidas es un regalo.</div>
-</div>
-
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Noviembre</div>
-    <div class="emoji">📸</div>
-    <div class="content">Cada recuerdo contigo es un tesoro.</div>
-</div>
-
-<div class="card" onclick="toggleCard(this)">
-    <div class="month-title">Diciembre</div>
-    <div class="emoji">🎄❤️</div>
-    <div class="content">Nuestro amor es lo más bonito del año.</div>
-</div>
-
-</div>
-
-<button class="btn" onclick="openModal()">Mensaje para ti ❤️</button>
-</div>
-
-<!-- MODAL -->
-<div class="modal" id="modal">
-<div class="modal-box">
-    <img src="https://ascomsa.com/masivos/images-productos/prest-2016/Foto5.jpeg">
-    <h2>Para ti, mi amor 💖</h2>
-    <p>
-        Gracias por ser parte de mi vida.  
-        En este 2026 quiero seguir caminando contigo,
-        creciendo juntos y amándonos cada día más.
-        Eres mi mejor elección ❤️
-    </p>
-    <button class="close" onclick="closeModal()">Cerrar ❤️</button>
-</div>
+    <div class="footer">Datos procesados localmente · Haz clic en los KPIs o en las barras para explorar detalles</div>
 </div>
 
 <script>
-function toggleCard(card){
-    document.querySelectorAll(".card").forEach(c=>{
-        if(c!==card) c.classList.remove("open");
-    });
-    card.classList.toggle("open");
-}
+    (function() {
+        // ---------- CONFIGURACIÓN ----------
+        const LOGO_URL = 'https://ascomsa.com/masivos/images-productos/prest-2016/LogoFinal.JPG';
+        document.getElementById('logoImg').src = LOGO_URL;
+        document.getElementById('logoUrlInput').value = LOGO_URL;
 
-function openModal(){
-    document.getElementById("modal").style.display="flex";
-}
+        let rawData = [];
+        let filteredData = [];
+        let chartInstances = {};
 
-function closeModal(){
-    document.getElementById("modal").style.display="none";
-}
+        // ---------- CONFIGURACIÓN DE GRÁFICOS (10 gráficos) ----------
+        const CHART_CONFIGS = [
+            { id: 'chart1', title: '📈 Flujo de Movilización Mensual', fullWidth: true },
+            { id: 'chart2', title: '💰 Valoración del Inventario ($) por Línea', fullWidth: false },
+            { id: 'chart3', title: '🔝 Top 10 Productos con Mayor Rotación (Egresos)', fullWidth: false },
+            { id: 'chart4', title: '📊 Distribución de Unidades en Stock por Línea', fullWidth: false },
+            { id: 'chart5', title: '⚠️ Nivel de Riesgo / Alerta de Stock', fullWidth: false },
+            { id: 'chart6', title: '📦 Análisis de Egresos por Motivo', fullWidth: false },
+            { id: 'chart7', title: '💎 Top 5 Productos con Mayor Capital Invertido', fullWidth: false },
+            { id: 'chart8', title: '🐢 Productos de Lento Movimiento (Stock Estancado)', fullWidth: false },
+            { id: 'chart9', title: '📉 Costo Promedio por Línea de Producto', fullWidth: false },
+            { id: 'chart10', title: '📋 Kardex Detallado (Tabla Interactiva)', fullWidth: true }
+        ];
 
-// Corazones flotantes
-setInterval(()=>{
-    const h=document.createElement("div");
-    h.className="heart";
-    h.textContent="💖";
-    h.style.left=Math.random()*100+"vw";
-    h.style.fontSize=Math.random()*20+15+"px";
-    document.body.appendChild(h);
-    setTimeout(()=>h.remove(),6000);
-},600);
+        // ---------- CONSTRUIR CONTENEDORES ----------
+        function buildChartContainers() {
+            const grid = document.getElementById('chartGrid');
+            grid.innerHTML = '';
+            CHART_CONFIGS.forEach(cfg => {
+                const card = document.createElement('div');
+                card.className = `chart-card ${cfg.fullWidth ? 'full-width' : ''}`;
+                card.id = `card-${cfg.id}`;
+                card.innerHTML = `
+                    <h3>${cfg.title}</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="${cfg.id}"></canvas>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        buildChartContainers();
+
+        // ---------- UTILIDADES ----------
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+        function hideError() {
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+
+        function parseDate(value) {
+            if (!value) return null;
+            if (typeof value === 'number') {
+                return new Date((value - 25569) * 86400 * 1000);
+            }
+            if (typeof value === 'string') {
+                const d = new Date(value);
+                if (!isNaN(d)) return d;
+                const parts = value.split(/[- :]/).map(Number);
+                if (parts.length >= 3) {
+                    return new Date(parts[0], parts[1]-1, parts[2], parts[3]||0, parts[4]||0, parts[5]||0);
+                }
+                return null;
+            }
+            if (value instanceof Date) return value;
+            return null;
+        }
+
+        function normalize(str) {
+            return String(str).trim().toUpperCase();
+        }
+
+        // ---------- CARGA DE DATOS ----------
+        function handleFile(file) {
+            hideError();
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+
+                    const rows = json.filter(row => {
+                        const codigo = String(row['codigo'] || '').trim();
+                        const articulo = String(row['Artículo'] || '').trim();
+                        if (!codigo && !articulo) return false;
+                        const fecha = parseDate(row['fecha']);
+                        if (!fecha) return false;
+                        row._fecha = fecha;
+                        return true;
+                    });
+
+                    rawData = rows.map(row => ({
+                        fecha: row._fecha,
+                        bodega: String(row['Bodega'] || ''),
+                        codigo: String(row['codigo'] || ''),
+                        articulo: String(row['Artículo'] || ''),
+                        linea: String(row['Linea'] || 'Sin línea'),
+                        documento: String(row['Documento'] || ''),
+                        t: String(row['T'] || ''),
+                        numero: String(row['#'] || ''),
+                        observacion: String(row['observacion'] || ''),
+                        ingreso: parseFloat(row['ingreso']) || 0,
+                        egreso: parseFloat(row['egreso']) || 0,
+                        saldo: parseFloat(row['Saldo']) || 0,
+                        costoUltimo: parseFloat(row['costo Ultimo']) || 0,
+                        costoPromedio: parseFloat(row['costo Promedio']) || 0,
+                        precio: parseFloat(row['Precio']) || 0,
+                        valor: parseFloat(row['valor']) || 0
+                    }));
+
+                    if (rawData.length === 0) {
+                        showError('No se encontraron datos válidos. Verifique el formato del archivo.');
+                        return;
+                    }
+
+                    document.getElementById('fileName').textContent = file.name;
+                    populateFilters();
+                    applyFilters();
+
+                } catch(err) {
+                    showError('Error al leer el archivo: ' + err.message);
+                    console.error(err);
+                }
+            };
+            reader.onerror = function() {
+                showError('Error al leer el archivo. Intente nuevamente.');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // ---------- FILTROS GLOBALES ----------
+        function populateFilters() {
+            const select = document.getElementById('lineFilter');
+            const lines = [...new Set(rawData.map(d => d.linea))].sort();
+            select.innerHTML = '<option value="all">Todas</option>';
+            lines.forEach(line => {
+                const opt = document.createElement('option');
+                opt.value = line;
+                opt.textContent = line;
+                select.appendChild(opt);
+            });
+
+            const fechas = rawData.map(d => d.fecha.getTime()).filter(t => !isNaN(t));
+            if (fechas.length) {
+                const minDate = new Date(Math.min(...fechas));
+                const maxDate = new Date(Math.max(...fechas));
+                const dateFrom = document.getElementById('dateFrom');
+                const dateTo = document.getElementById('dateTo');
+                dateFrom.value = formatDateInput(minDate);
+                dateTo.value = formatDateInput(maxDate);
+                dateFrom.min = formatDateInput(minDate);
+                dateTo.max = formatDateInput(maxDate);
+            }
+        }
+
+        function formatDateInput(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth()+1).padStart(2,'0');
+            const d = String(date.getDate()).padStart(2,'0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function applyFilters() {
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const line = document.getElementById('lineFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            filteredData = rawData.filter(d => {
+                if (dateFrom) {
+                    const from = new Date(dateFrom);
+                    if (d.fecha < from) return false;
+                }
+                if (dateTo) {
+                    const to = new Date(dateTo);
+                    to.setHours(23,59,59,999);
+                    if (d.fecha > to) return false;
+                }
+                if (line !== 'all' && d.linea !== line) return false;
+                if (search) {
+                    const inCodigo = d.codigo.toLowerCase().includes(search);
+                    const inArticulo = d.articulo.toLowerCase().includes(search);
+                    if (!inCodigo && !inArticulo) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('recordCount').textContent = `${filteredData.length} registros`;
+            updateInventoryPanel();
+            updateKPIs();
+            updateAllCharts();
+        }
+
+        // ---------- CÁLCULOS ----------
+        function getProductFinalData(data) {
+            const map = {};
+            data.forEach(d => {
+                const key = d.codigo;
+                if (!map[key]) {
+                    map[key] = {
+                        codigo: d.codigo,
+                        articulo: d.articulo,
+                        linea: d.linea,
+                        saldo: 0,
+                        costoPromedio: d.costoPromedio,
+                        ingresoTotal: 0,
+                        egresoTotal: 0,
+                        primeraFecha: d.fecha,
+                        ultimaFecha: d.fecha,
+                        observaciones: []
+                    };
+                }
+                map[key].saldo = d.saldo;
+                map[key].costoPromedio = d.costoPromedio;
+                map[key].ingresoTotal += d.ingreso;
+                map[key].egresoTotal += d.egreso;
+                if (d.fecha < map[key].primeraFecha) map[key].primeraFecha = d.fecha;
+                if (d.fecha > map[key].ultimaFecha) map[key].ultimaFecha = d.fecha;
+                if (d.observacion) map[key].observaciones.push(d.observacion);
+            });
+            return Object.values(map);
+        }
+
+        // ---------- PANEL DE INVENTARIO ----------
+        function updateInventoryPanel() {
+            const productos = getProductFinalData(filteredData);
+            const totalStock = productos.reduce((s, p) => s + p.saldo, 0);
+            const totalValor = productos.reduce((s, p) => s + (p.saldo * p.costoPromedio), 0);
+
+            // Días de inventario: promedio ponderado por unidades
+            const hoy = new Date();
+            let totalDias = 0;
+            let totalUnidadesDias = 0;
+            productos.forEach(p => {
+                if (p.saldo > 0 && p.primeraFecha) {
+                    const dias = Math.max(1, Math.floor((hoy - p.primeraFecha) / (1000*60*60*24)));
+                    totalDias += dias * p.saldo;
+                    totalUnidadesDias += p.saldo;
+                }
+            });
+            const diasPromedio = totalUnidadesDias > 0 ? Math.round(totalDias / totalUnidadesDias) : 0;
+
+            document.getElementById('invDays').textContent = diasPromedio;
+            document.getElementById('invUnits').textContent = totalStock.toFixed(0);
+            document.getElementById('invValue').textContent = '$' + totalValor.toFixed(2);
+        }
+
+        // ---------- KPIs ----------
+        function updateKPIs() {
+            const productos = getProductFinalData(filteredData);
+            const totalStock = productos.reduce((s, p) => s + p.saldo, 0);
+            const totalValor = productos.reduce((s, p) => s + (p.saldo * p.costoPromedio), 0);
+            const totalIngresos = filteredData.reduce((s, d) => s + d.ingreso, 0);
+            const totalEgresos = filteredData.reduce((s, d) => s + d.egreso, 0);
+            const skus = productos.length;
+
+            const container = document.getElementById('kpiContainer');
+            container.innerHTML = `
+                <div class="kpi-card" data-kpi="valor">
+                    <div class="label">💰 Valor Inventario</div>
+                    <div class="value">$${totalValor.toFixed(2)}</div>
+                </div>
+                <div class="kpi-card" data-kpi="stock">
+                    <div class="label">📦 Stock Total</div>
+                    <div class="value">${totalStock.toFixed(0)}</div>
+                </div>
+                <div class="kpi-card" data-kpi="ingresos">
+                    <div class="label">⬆️ Ingresos Totales</div>
+                    <div class="value">${totalIngresos.toFixed(0)}</div>
+                </div>
+                <div class="kpi-card alert" data-kpi="egresos">
+                    <div class="label">⬇️ Egresos Totales</div>
+                    <div class="value">${totalEgresos.toFixed(0)}</div>
+                </div>
+                <div class="kpi-card" data-kpi="skus">
+                    <div class="label">🏷️ SKUs</div>
+                    <div class="value">${skus}</div>
+                </div>
+            `;
+            attachKPIListeners();
+        }
+
+        function attachKPIListeners() {
+            document.querySelectorAll('.kpi-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const type = this.dataset.kpi;
+                    const productos = getProductFinalData(filteredData);
+                    let title = '', data = [];
+                    switch(type) {
+                        case 'valor':
+                            title = '💰 Productos con Mayor Capital Invertido';
+                            data = productos.filter(p => p.saldo * p.costoPromedio > 0)
+                                           .sort((a,b) => (b.saldo*b.costoPromedio) - (a.saldo*a.costoPromedio));
+                            break;
+                        case 'stock':
+                            title = '📦 Productos con Stock Disponible';
+                            data = productos.filter(p => p.saldo > 0);
+                            break;
+                        case 'ingresos':
+                            title = '⬆️ Productos con Ingresos';
+                            data = productos.filter(p => p.ingresoTotal > 0)
+                                           .sort((a,b) => b.ingresoTotal - a.ingresoTotal);
+                            break;
+                        case 'egresos':
+                            title = '⬇️ Productos con Egresos';
+                            data = productos.filter(p => p.egresoTotal > 0)
+                                           .sort((a,b) => b.egresoTotal - a.egresoTotal);
+                            break;
+                        case 'skus':
+                            title = '🏷️ Todos los Productos (SKUs)';
+                            data = productos;
+                            break;
+                    }
+                    showDetail(title, data);
+                });
+            });
+        }
+
+        // ---------- PANEL DE DETALLE ----------
+        function showDetail(title, productList) {
+            const panel = document.getElementById('detailPanel');
+            document.getElementById('detailTitle').textContent = title;
+            const content = document.getElementById('detailContent');
+            if (!productList || productList.length === 0) {
+                content.innerHTML = '<p class="empty-msg">No hay productos para mostrar.</p>';
+            } else {
+                let html = `<table class="detail-table">
+                    <thead><tr><th>Código</th><th>Artículo</th><th>Línea</th><th>Stock</th><th>Costo Prom.</th><th>Ingresos</th><th>Egresos</th></tr></thead><tbody>`;
+                productList.forEach(p => {
+                    html += `<tr><td>${p.codigo}</td><td>${p.articulo}</td><td>${p.linea}</td><td>${p.saldo}</td><td>${p.costoPromedio.toFixed(2)}</td><td>${p.ingresoTotal}</td><td>${p.egresoTotal}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+                content.innerHTML = html;
+            }
+            panel.classList.add('open');
+        }
+
+        document.getElementById('closeDetail').addEventListener('click', function() {
+            document.getElementById('detailPanel').classList.remove('open');
+        });
+
+        // ---------- GRÁFICOS (1 al 9) ----------
+        function createOnClick(filterFn, title) {
+            return function(evt, item) {
+                if (item && item.length > 0) {
+                    const index = item[0].index;
+                    const label = item[0].chart.data.labels[index];
+                    const productos = getProductFinalData(filteredData);
+                    let filtered = productos.filter(filterFn(label));
+                    showDetail(`${title}: ${label}`, filtered);
+                }
+            };
+        }
+
+        function renderChart1(data) {
+            const months = {};
+            data.forEach(d => {
+                if (!d.fecha) return;
+                const key = d.fecha.getFullYear() + '-' + String(d.fecha.getMonth()+1).padStart(2,'0');
+                if (!months[key]) months[key] = { ingresos: 0, egresos: 0 };
+                months[key].ingresos += d.ingreso;
+                months[key].egresos += d.egreso;
+            });
+            const sorted = Object.keys(months).sort();
+            const labels = sorted;
+            const ingresos = sorted.map(k => months[k].ingresos);
+            const egresos = sorted.map(k => months[k].egresos);
+            const ctx = document.getElementById('chart1').getContext('2d');
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Ingresos', data: ingresos, borderColor: '#0D2C54', backgroundColor: 'rgba(13,44,84,0.1)', fill: true, tension: 0.2 },
+                        { label: 'Egresos', data: egresos, borderColor: '#FF6B00', backgroundColor: 'rgba(255,107,0,0.1)', fill: true, tension: 0.2 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    onClick: function(evt, item) {
+                        if (item && item.length > 0) {
+                            const index = item[0].index;
+                            const label = this.data.labels[index];
+                            const [year, month] = label.split('-').map(Number);
+                            const productos = getProductFinalData(filteredData);
+                            const filtered = productos.filter(p => {
+                                const movimientos = filteredData.filter(d => d.codigo === p.codigo &&
+                                    d.fecha.getFullYear() === year && d.fecha.getMonth()+1 === month);
+                                return movimientos.length > 0;
+                            });
+                            showDetail(`Productos con movimiento en ${label}`, filtered);
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChart2(data) {
+            const productos = getProductFinalData(data);
+            const lineValor = {};
+            productos.forEach(p => {
+                const valor = p.saldo * p.costoPromedio;
+                const key = p.linea;
+                lineValor[key] = (lineValor[key] || 0) + valor;
+            });
+            const labels = Object.keys(lineValor);
+            const values = Object.values(lineValor);
+            const ctx = document.getElementById('chart2').getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Valor ($)',
+                        data: values,
+                        backgroundColor: '#0D2C54',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    onClick: createOnClick((label) => (p) => p.linea === label, 'Productos en línea')
+                }
+            });
+        }
+
+        function renderChart3(data) {
+            const prodEgreso = {};
+            data.forEach(d => {
+                const key = d.codigo;
+                if (!prodEgreso[key]) prodEgreso[key] = { articulo: d.articulo, codigo: d.codigo, linea: d.linea, egreso: 0 };
+                prodEgreso[key].egreso += d.egreso;
+            });
+            const sorted = Object.values(prodEgreso).sort((a,b) => b.egreso - a.egreso).slice(0,10);
+            const labels = sorted.map(p => p.articulo.length > 20 ? p.articulo.substring(0,20)+'…' : p.articulo);
+            const values = sorted.map(p => p.egreso);
+            const ctx = document.getElementById('chart3').getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Egresos (unidades)',
+                        data: values,
+                        backgroundColor: '#FF6B00',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    onClick: function(evt, item) {
+                        if (item && item.length > 0) {
+                            const index = item[0].index;
+                            const producto = sorted[index];
+                            const productos = getProductFinalData(filteredData);
+                            const filtered = productos.filter(p => p.codigo === producto.codigo);
+                            showDetail(`Producto: ${producto.articulo}`, filtered);
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChart4(data) {
+            const productos = getProductFinalData(data);
+            const lineStock = {};
+            productos.forEach(p => {
+                const key = p.linea;
+                lineStock[key] = (lineStock[key] || 0) + p.saldo;
+            });
+            const labels = Object.keys(lineStock);
+            const values = Object.values(lineStock);
+            const colors = ['#0D2C54','#FF6B00','#3b82f6','#8b5cf6','#22c55e','#f59e0b','#ec4899','#14b8a6'];
+            const ctx = document.getElementById('chart4').getContext('2d');
+            return new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors.slice(0, labels.length),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } },
+                    onClick: function(evt, item) {
+                        if (item && item.length > 0) {
+                            const index = item[0].index;
+                            const label = this.data.labels[index];
+                            const productos = getProductFinalData(filteredData);
+                            const filtered = productos.filter(p => p.linea === label);
+                            showDetail(`Productos en línea ${label}`, filtered);
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChart5(data) {
+            const productos = getProductFinalData(data);
+            let agotado = [], bajo = [], optimo = [];
+            productos.forEach(p => {
+                const saldo = p.saldo;
+                if (saldo === 0) agotado.push(p);
+                else if (saldo <= 2) bajo.push(p);
+                else optimo.push(p);
+            });
+            const ctx = document.getElementById('chart5').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Agotado (0)', 'Stock Bajo (1-2)', 'Óptimo (>3)'],
+                    datasets: [{
+                        label: 'Cantidad de Productos',
+                        data: [agotado.length, bajo.length, optimo.length],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#22c55e'],
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    onClick: function(evt, item) {
+                        if (item && item.length > 0) {
+                            const index = item[0].index;
+                            let filtered = [];
+                            if (index === 0) filtered = agotado;
+                            else if (index === 1) filtered = bajo;
+                            else if (index === 2) filtered = optimo;
+                            const labels = ['Agotado', 'Stock Bajo', 'Óptimo'];
+                            showDetail(`Productos en estado: ${labels[index]}`, filtered);
+                        }
+                    }
+                }
+            });
+            chart._agotado = agotado;
+            chart._bajo = bajo;
+            chart._optimo = optimo;
+            return chart;
+        }
+
+        function renderChart6(data) {
+            const categorias = {
+                'Facturación': ['FACTURAR', 'FACTURA', 'FACTURACION'],
+                'Garantía': ['GARANTIA'],
+                'Devolución': ['DEVOLUCION', 'RETORNO'],
+                'Otros': []
+            };
+            const motivos = { Facturación: [], Garantía: [], Devolución: [], Otros: [] };
+            data.forEach(d => {
+                if (d.egreso === 0) return;
+                const obs = normalize(d.observacion);
+                let asignado = false;
+                for (const [cat, palabras] of Object.entries(categorias)) {
+                    if (palabras.some(p => obs.includes(p))) {
+                        motivos[cat].push(d);
+                        asignado = true;
+                        break;
+                    }
+                }
+                if (!asignado) motivos['Otros'].push(d);
+            });
+            const labels = Object.keys(motivos);
+            const values = labels.map(k => motivos[k].reduce((sum, d) => sum + d.egreso, 0));
+            const ctx = document.getElementById('chart6').getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Egresos (unidades)',
+                        data: values,
+                        backgroundColor: ['#0D2C54', '#FF6B00', '#8b5cf6', '#94a3b8'],
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    onClick: function(evt, item) {
+                        if (item && item.length > 0) {
+                            const index = item[0].index;
+                            const label = this.data.labels[index];
+                            const movs = motivos[label] || [];
+                            const codigos = new Set(movs.map(d => d.codigo));
+                            const productos = getProductFinalData(filteredData).filter(p => codigos.has(p.codigo));
+                            showDetail(`Productos con egresos por ${label}`, productos);
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChart7(data) {
+            const productos = getProductFinalData(data);
+            const conValor = productos.map(p => ({
+                ...p,
+                capital: p.saldo * p.costoPromedio
+            })).sort((a,b) => b.capital - a.capital).slice(0,5);
+            const labels = conValor.map(p => p.articulo.length > 20 ? p.articulo.substring(0,20)+'…' : p.articulo);
+            const values = conValor.map(p => p.capital);
+            const ctx = document.getElementById('chart7').getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Capital Invertido ($)',
+                        data: values,
+                        backgroundColor: '#0D2C54',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    onClick: function(evt, item) {
+                        if (item && item.length > 0) {
+                            const index = item[0].index;
+                            const producto = conValor[index];
+                            const filtered = getProductFinalData(filteredData).filter(p => p.codigo === producto.codigo);
+                            showDetail(`Producto: ${producto.articulo}`, filtered);
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChart8(data) {
+            const productos = getProductFinalData(data);
+            const lentos = productos.filter(p => p.saldo > 0 && p.egresoTotal <= 1)
+                .sort((a,b) => a.egresoTotal - b.egresoTotal)
+                .slice(0,10);
+            const labels = lentos.map(p => p.articulo.length > 20 ? p.articulo.substring(0,20)+'…' : p.articulo);
+            const values = lentos.map(p => p.saldo);
+            const ctx = document.getElementById('chart8').getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock Actual',
+                        data: values,
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    onClick: function(evt, item) {
+                        if (item && item.length > 0) {
+                            const index = item[0].index;
+                            const producto = lentos[index];
+                            const filtered = getProductFinalData(filteredData).filter(p => p.codigo === producto.codigo);
+                            showDetail(`Producto: ${producto.articulo}`, filtered);
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChart9(data) {
+            const lineCosto = {};
+            const lineCount = {};
+            data.forEach(d => {
+                const key = d.linea;
+                if (d.costoPromedio > 0) {
+                    lineCosto[key] = (lineCosto[key] || 0) + d.costoPromedio;
+                    lineCount[key] = (lineCount[key] || 0) + 1;
+                }
+            });
+            const labels = Object.keys(lineCosto);
+            const values = labels.map(k => lineCosto[k] / lineCount[k]);
+            const ctx = document.getElementById('chart9').getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Costo Promedio ($)',
+                        data: values,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    onClick: createOnClick((label) => (p) => p.linea === label, 'Productos en línea')
+                }
+            });
+        }
+
+        // ---------- GRÁFICO 10: TABLA KARDEX CON FILTROS Y NUEVAS COLUMNAS ----------
+        let tableFilters = { movement: 'all', minStock: 0 };
+
+        function renderChart10(data) {
+            const card = document.getElementById('card-chart10');
+            if (!card) return;
+            const wrapper = card.querySelector('.chart-wrapper');
+            if (!wrapper) return;
+
+            wrapper.innerHTML = '';
+
+            // Controles de filtro para la tabla
+            const filterDiv = document.createElement('div');
+            filterDiv.className = 'table-filters';
+            filterDiv.innerHTML = `
+                <label>📌 Mostrar:</label>
+                <select id="tableMovementFilter">
+                    <option value="all">Todos</option>
+                    <option value="ingresos">Solo Ingresos</option>
+                    <option value="egresos">Solo Egresos</option>
+                </select>
+                <label>📊 Stock mínimo:</label>
+                <input type="number" id="tableMinStock" value="0" min="0" step="1">
+                <span class="filter-badge" id="tableRowCount">0 filas</span>
+            `;
+            wrapper.appendChild(filterDiv);
+
+            const tableContainer = document.createElement('div');
+            tableContainer.className = 'table-wrapper';
+            wrapper.appendChild(tableContainer);
+
+            // Función para aplicar filtros de tabla y renderizar
+            function applyTableFilters() {
+                const movementFilter = document.getElementById('tableMovementFilter').value;
+                const minStock = parseInt(document.getElementById('tableMinStock').value) || 0;
+                tableFilters.movement = movementFilter;
+                tableFilters.minStock = minStock;
+
+                let filtered = data.slice();
+                if (movementFilter === 'ingresos') {
+                    filtered = filtered.filter(d => d.ingreso > 0);
+                } else if (movementFilter === 'egresos') {
+                    filtered = filtered.filter(d => d.egreso > 0);
+                }
+                if (minStock > 0) {
+                    filtered = filtered.filter(d => d.saldo >= minStock);
+                }
+
+                document.getElementById('tableRowCount').textContent = `${filtered.length} filas`;
+                renderTable(tableContainer, filtered);
+            }
+
+            // Función para dibujar la tabla con columnas adicionales
+            function renderTable(container, dataToShow) {
+                container.innerHTML = '';
+                if (!dataToShow || dataToShow.length === 0) {
+                    container.innerHTML = '<p class="empty-msg" style="padding:20px; text-align:center; color:#94a3b8;">No hay registros que coincidan con los filtros.</p>';
+                    return;
+                }
+
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+
+                // Definir columnas incluyendo las nuevas: Días, Valor del saldo, Valor del movimiento
+                const columns = [
+                    'Fecha', 'Código', 'Artículo', 'Línea', 
+                    'Ingreso', 'Egreso', 'Saldo', 
+                    'Costo Prom.', 
+                    'Días',          // Nueva: días desde la fecha de la transacción hasta hoy
+                    'Valor Saldo',   // Nueva: saldo * costo promedio
+                    'Valor Mov.'     // Nueva: (ingreso - egreso) * costo promedio (o ingreso * costo, egreso * costo)
+                ];
+
+                columns.forEach(col => {
+                    const th = document.createElement('th');
+                    th.textContent = col;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                const hoy = new Date();
+                const tbody = document.createElement('tbody');
+                const displayData = dataToShow.slice(0, 500);
+                displayData.forEach(d => {
+                    const tr = document.createElement('tr');
+
+                    // Calcular días transcurridos desde la fecha de la transacción
+                    let dias = '';
+                    if (d.fecha) {
+                        const diffTime = hoy - d.fecha;
+                        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                        dias = diffDays >= 0 ? diffDays : '0';
+                    }
+
+                    // Valor del saldo actual de esa fila
+                    const valorSaldo = d.saldo * d.costoPromedio;
+
+                    // Valor del movimiento neto (ingreso - egreso) * costo promedio
+                    const valorMovimiento = (d.ingreso - d.egreso) * d.costoPromedio;
+
+                    const cells = [
+                        d.fecha ? d.fecha.toLocaleDateString() : '',
+                        d.codigo,
+                        d.articulo,
+                        d.linea,
+                        d.ingreso,
+                        d.egreso,
+                        d.saldo,
+                        d.costoPromedio.toFixed(2),
+                        dias,
+                        valorSaldo.toFixed(2),
+                        valorMovimiento.toFixed(2)
+                    ];
+                    cells.forEach(val => {
+                        const td = document.createElement('td');
+                        td.textContent = val;
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                if (dataToShow.length > 500) {
+                    const tr = document.createElement('tr');
+                    const td = document.createElement('td');
+                    td.colSpan = columns.length;
+                    td.textContent = `... y ${dataToShow.length - 500} filas más (se muestran las primeras 500)`;
+                    td.style.textAlign = 'center';
+                    td.style.fontStyle = 'italic';
+                    td.style.color = '#94a3b8';
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                }
+                table.appendChild(tbody);
+                container.appendChild(table);
+                container.style.height = 'auto';
+            }
+
+            // Asignar eventos a los controles
+            const movementSelect = filterDiv.querySelector('#tableMovementFilter');
+            const minStockInput = filterDiv.querySelector('#tableMinStock');
+            movementSelect.addEventListener('change', applyTableFilters);
+            minStockInput.addEventListener('input', applyTableFilters);
+
+            // Aplicar filtros iniciales
+            applyTableFilters();
+
+            // Guardar referencia para actualizar cuando cambien los datos globales
+            card._updateTable = applyTableFilters;
+        }
+
+        // ---------- ACTUALIZAR GRÁFICOS ----------
+        const renderFunctions = {
+            chart1: renderChart1,
+            chart2: renderChart2,
+            chart3: renderChart3,
+            chart4: renderChart4,
+            chart5: renderChart5,
+            chart6: renderChart6,
+            chart7: renderChart7,
+            chart8: renderChart8,
+            chart9: renderChart9,
+            chart10: renderChart10
+        };
+
+        function updateAllCharts() {
+            Object.keys(chartInstances).forEach(key => {
+                if (chartInstances[key]) {
+                    chartInstances[key].destroy();
+                    delete chartInstances[key];
+                }
+            });
+            // Gráficos 1-9
+            CHART_CONFIGS.filter(cfg => cfg.id !== 'chart10').forEach(cfg => {
+                const fn = renderFunctions[cfg.id];
+                if (fn) {
+                    const result = fn(filteredData);
+                    if (result && typeof result === 'object' && result.destroy) {
+                        chartInstances[cfg.id] = result;
+                    }
+                }
+            });
+            // Gráfico 10 (tabla) se actualiza llamando a su función
+            renderChart10(filteredData);
+        }
+
+        // ---------- MODAL CORPORATIVO ----------
+        document.getElementById('infoButton').addEventListener('click', function() {
+            document.getElementById('corporateModal').classList.add('active');
+        });
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('corporateModal').classList.remove('active');
+        });
+        document.getElementById('corporateModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // ---------- EVENTOS ----------
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            if (this.files && this.files.length > 0) {
+                handleFile(this.files[0]);
+            }
+        });
+        document.getElementById('dateFrom').addEventListener('change', applyFilters);
+        document.getElementById('dateTo').addEventListener('change', applyFilters);
+        document.getElementById('lineFilter').addEventListener('change', applyFilters);
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+        // ---------- INICIALIZACIÓN ----------
+        function showPlaceholders() {
+            const canvases = document.querySelectorAll('canvas');
+            canvases.forEach(c => {
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#f1f5f9';
+                ctx.fillRect(0, 0, c.width, c.height);
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Cargue un archivo Excel para visualizar', c.width/2, c.height/2);
+            });
+            const card10 = document.getElementById('card-chart10');
+            if (card10) {
+                const wrapper = card10.querySelector('.chart-wrapper');
+                if (wrapper) {
+                    wrapper.innerHTML = '<p class="empty-msg" style="padding:20px; text-align:center; color:#94a3b8;">Cargue un archivo para ver el Kardex</p>';
+                }
+            }
+        }
+        showPlaceholders();
+        document.getElementById('recordCount').textContent = '0 registros';
+        document.getElementById('invDays').textContent = '-';
+        document.getElementById('invUnits').textContent = '-';
+        document.getElementById('invValue').textContent = '-';
+
+        // Actualizar logo
+        document.getElementById('logoUrlInput').addEventListener('change', function() {
+            document.getElementById('logoImg').src = this.value;
+        });
+
+        console.log('✅ Dashboard ASCOMSA con tabla Kardex mejorada. Carga tu Excel y explora.');
+        console.log('📊 Nuevas columnas: Días, Valor Saldo, Valor Movimiento.');
+    })();
 </script>
-
 </body>
 </html>
-
